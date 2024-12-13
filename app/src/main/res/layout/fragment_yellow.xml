@@ -29,20 +29,6 @@
         app:shapeAppearance="@style/RoundedStyle" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/light_code"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:textColor="#222222"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/image_logo"
-        tools:text="UserID:1234" />
-
-
-    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/light_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

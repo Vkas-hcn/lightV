@@ -6,6 +6,7 @@ import android.net.NetworkCapabilities
 import android.util.Log
 import com.light.lightV.BuildConfig
 import com.light.lightV.R
+import com.light.lightV.purple.YellowDialog
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -90,6 +91,17 @@ fun isNetworkAvailable(context: Context): Boolean {
                 networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
     }
     return false
+}
+
+fun isNetworkConnected(context: Context,nextFUn:()->Unit): Boolean {
+    val mConnectivityManager =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val mNetworkInfo = mConnectivityManager.activeNetworkInfo
+    if (mNetworkInfo != null) {
+        return !mNetworkInfo.isAvailable
+    }
+    nextFUn()
+    return true
 }
 
 

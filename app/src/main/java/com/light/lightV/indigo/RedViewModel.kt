@@ -7,6 +7,7 @@ import com.github.shadowsocks.database.ProfileManager
 import com.google.gson.Gson
 import com.light.lightV.BuildConfig
 import com.light.lightV.blue.ggggg.AdUtils
+import com.light.lightV.green.RedApp
 import com.light.lightV.green.getKv
 import com.light.lightV.green.lightVDebugLog
 import com.light.lightV.green.putKv
@@ -123,7 +124,6 @@ var olderServer: ArrayList<SeverCountryContainer> = arrayListOf()
 
 
 var currentSelectSever: WaterBt? = null
-var vcurrentSelectSeverIsSmart = false
 
 fun changeSever(entity: WaterBt?, isSmart: Boolean = true) {
     if (entity == null) return
@@ -137,7 +137,8 @@ fun changeSever(entity: WaterBt?, isSmart: Boolean = true) {
             method = entity.addSecretWay
         )
     )
-    vcurrentSelectSeverIsSmart = isSmart
+    RedApp.vcurrentSelectSeverIsSmart = isSmart
+
     currentSelectSever = entity
     Core.switchProfile(profile.id)
 }

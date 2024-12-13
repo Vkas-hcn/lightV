@@ -40,10 +40,7 @@ class YellowFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lightDate.text = "".toNow()
-
-        binding.lightCode.text = "User ID:" + "userCode".getKv()
         binding.menuSever.setOnClickListener {
-
             if (isLoadingSever) {
                 disLoading()
                 CoroutineScope(Dispatchers.IO).launch {

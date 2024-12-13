@@ -10,14 +10,17 @@ import com.google.android.gms.ads.MobileAds
 import com.google.firebase.FirebaseApp
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.initialize
+import com.light.lightV.blue.ggggg.AdUtils
 import com.light.lightV.blue.ggggg.BaseAd
 import com.light.lightV.indigo.getPackages
 import com.light.lightV.indigo.loadAdminType
 import com.light.lightV.red.AppLifeMaster
 import com.light.lightV.red.RedActivity
 import com.tencent.mmkv.MMKV
+import kotlin.random.Random
 
 class RedApp : Application() {
+
     override fun onCreate() {
         super.onCreate()
         redApp = this
@@ -35,6 +38,22 @@ class RedApp : Application() {
             netLimit()
             loadAdminType()
         }
+    }
+
+    fun getUserDId() {
+        "userCode".getKv().let {
+            if (it.isBlank()) {
+                val num = generateRandomFourDigitNumber().toString()
+                num.putKv("userCode")
+                AdUtils.log("userCode1=====${num}")
+                AdUtils.log("userCode2=====${it}")
+            }
+        }
+    }
+
+    fun generateRandomFourDigitNumber(): Int {
+        // 生成1000到9999之间的随机数
+        return Random.nextInt(1000, 10000)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -56,5 +75,7 @@ class RedApp : Application() {
 
     companion object {
         lateinit var redApp: Application
+        var vcurrentSelectSeverIsSmart = false
+        var vcurrentSelectSeverIsSmart2222 = true
     }
 }

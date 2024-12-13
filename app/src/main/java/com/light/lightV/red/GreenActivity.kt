@@ -15,6 +15,7 @@ import com.light.lightV.blue.RedMob
 import com.light.lightV.blue.ggggg.BaseAd
 import com.light.lightV.blue.updateLimit
 import com.light.lightV.databinding.ActivityGreenBinding
+import com.light.lightV.green.RedApp
 import com.light.lightV.green.isLimit
 import com.light.lightV.green.lightVDebugLog
 import com.light.lightV.green.mobInterstitialB
@@ -22,7 +23,6 @@ import com.light.lightV.indigo.appSeverLists
 import com.light.lightV.indigo.changeSever
 import com.light.lightV.indigo.currentSelectSever
 import com.light.lightV.indigo.olderServer
-import com.light.lightV.indigo.vcurrentSelectSeverIsSmart
 import com.light.lightV.orange.globalConnectState
 import com.light.lightV.orange.globalSpecialLaunchAgainB
 import com.light.lightV.orange.globalSpecialWaitTimeB
@@ -75,7 +75,7 @@ class GreenActivity : AppCompatActivity() {
 
             yellowAdapter.yellowUpdateAll = {
                 if (globalConnectState == BaseService.State.Connected) {
-                    if (vcurrentSelectSeverIsSmart || it.ip != currentSelectSever?.ip) {
+                    if (RedApp.vcurrentSelectSeverIsSmart || it.ip != currentSelectSever?.ip) {
                         GreenDialog().apply {
                             okAction = {
                                 changeSever(it, false)
@@ -116,10 +116,10 @@ class GreenActivity : AppCompatActivity() {
     private fun updateSmartPart() {
         with(binding) {
             with(widgetSmart) {
-                smartSelect.setImageResource(if (vcurrentSelectSeverIsSmart) R.mipmap.sever_select_logo else R.mipmap.sever_no_select_logo)
+                smartSelect.setImageResource(if (RedApp.vcurrentSelectSeverIsSmart) R.mipmap.sever_select_logo else R.mipmap.sever_no_select_logo)
                 root.setOnClickListener {
                     if (globalConnectState == BaseService.State.Connected) {
-                        if (vcurrentSelectSeverIsSmart) return@setOnClickListener
+                        if (RedApp.vcurrentSelectSeverIsSmart) return@setOnClickListener
                         GreenDialog().apply {
                             okAction = {
                                 changeSever(appSeverLists?.data?.smartList?.random(), true)

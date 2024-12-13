@@ -24,6 +24,7 @@ class AppLifeMaster : Application.ActivityLifecycleCallbacks, LifecycleObserver 
     var adActivity: Activity? = null
     private fun restartApp(activity: Activity) {
         if (adActivity != null) {
+            clondAd = true
             adActivity?.finish()
         }
         val intent = Intent(activity, RedActivity::class.java)

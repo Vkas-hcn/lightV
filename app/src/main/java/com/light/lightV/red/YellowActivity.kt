@@ -26,6 +26,7 @@ import com.light.lightV.blue.ggggg.AdUtils
 import com.light.lightV.blue.ggggg.BaseAd
 import com.light.lightV.blue.updateLimit
 import com.light.lightV.databinding.ActivityYellowBinding
+import com.light.lightV.green.RedApp.Companion.vcurrentSelectSeverIsSmart
 import com.light.lightV.green.getIntFromString
 import com.light.lightV.green.isLimit
 import com.light.lightV.green.lightVDebugLog
@@ -33,7 +34,6 @@ import com.light.lightV.green.mobInterstitialA
 import com.light.lightV.green.mobInterstitialC
 import com.light.lightV.green.mobNativeB
 import com.light.lightV.indigo.currentSelectSever
-import com.light.lightV.indigo.vcurrentSelectSeverIsSmart
 import com.light.lightV.orange.globalSpecialLaunchAgainB
 import com.light.lightV.orange.globalSpecialWaitTimeB
 import com.light.lightV.orange.specialLaunchAgainA
@@ -209,10 +209,6 @@ class YellowActivity : AppCompatActivity(), ShadowsocksConnection.Callback {
         showEndJob?.cancel()
         showEndJob = null
         val baseAd = BaseAd.getEndInstance()
-        if (AdUtils.blockAdBlacklist()) {
-            binding.adLayout.isVisible = false
-            return
-        }
         if (!AdUtils.isVPNConnected()) {
             binding.imgOcAd.isVisible = true
             return

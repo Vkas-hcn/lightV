@@ -27,6 +27,7 @@ import com.light.lightV.blue.RedMob
 import com.light.lightV.blue.ggggg.AdUtils
 import com.light.lightV.blue.ggggg.BaseAd
 import com.light.lightV.databinding.ActivityRedBinding
+import com.light.lightV.green.RedApp
 import com.light.lightV.green.RedApp.Companion.redApp
 import com.light.lightV.green.dealU
 import com.light.lightV.green.getKv
@@ -93,6 +94,8 @@ class RedActivity : AppCompatActivity() {
     private fun initTime() {
         getFileBaseData()
         startCountdown()
+        RedApp().getUserDId()
+
     }
 
     private fun startCountdown() {
@@ -257,12 +260,9 @@ class RedActivity : AppCompatActivity() {
             while (lifecycle.currentState != Lifecycle.State.RESUMED) {
                 delay(100)
             }
-            if(clondAd){
-                return@launch
-            }
+            clondAd = false
             val intent = Intent(this@RedActivity, OrangeActivity::class.java)
             startActivity(intent)
-            clondAd = false
         }
     }
 

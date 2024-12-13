@@ -5,9 +5,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.light.lightV.R
 import com.light.lightV.databinding.ItemYellowBinding
+import com.light.lightV.green.RedApp.Companion.vcurrentSelectSeverIsSmart
 import com.light.lightV.indigo.WaterBt
 import com.light.lightV.indigo.currentSelectSever
-import com.light.lightV.indigo.vcurrentSelectSeverIsSmart
 
 
 class GreenAdapter : RecyclerView.Adapter<GreenAdapter.GreenVh>() {

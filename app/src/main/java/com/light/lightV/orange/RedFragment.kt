@@ -44,16 +44,14 @@ import com.light.lightV.blue.ggggg.AdUtils.log
 import com.light.lightV.blue.ggggg.BaseAd
 import com.light.lightV.blue.updateLimit
 import com.light.lightV.databinding.FragmentRedBinding
+import com.light.lightV.green.RedApp
+import com.light.lightV.green.RedApp.Companion.vcurrentSelectSeverIsSmart2222
 import com.light.lightV.green.addressLimit
 import com.light.lightV.green.getIntFromString
 import com.light.lightV.green.getKv
-import com.light.lightV.green.isLimit
 import com.light.lightV.green.isNetworkAvailable
+import com.light.lightV.green.isNetworkConnected
 import com.light.lightV.green.lightVDebugLog
-import com.light.lightV.green.mobInterstitialA
-import com.light.lightV.green.mobInterstitialC
-import com.light.lightV.green.mobNativeA
-import com.light.lightV.green.mobNativeB
 import com.light.lightV.green.putKv
 import com.light.lightV.green.toNow
 import com.light.lightV.indigo.OrangeVM
@@ -62,13 +60,13 @@ import com.light.lightV.indigo.changeSever
 import com.light.lightV.indigo.currentSelectSever
 import com.light.lightV.indigo.isLoadingSever
 import com.light.lightV.indigo.loadSevers
-import com.light.lightV.indigo.vcurrentSelectSeverIsSmart
 import com.light.lightV.purple.OrangeDialog
 import com.light.lightV.purple.RedDialog
 import com.light.lightV.purple.YellowDialog
 import com.light.lightV.red.GreenActivity
 import com.light.lightV.red.RedActivity
 import com.light.lightV.red.YellowActivity
+import com.light.lightV.red.clondAd
 import com.light.lightV.red.noAllowLaunchAgain
 import com.light.lightV.red.resultGlobalAction
 import kotlinx.coroutines.CoroutineScope
@@ -80,7 +78,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
-import kotlinx.coroutines.withTimeoutOrNull
 
 
 var globalConnectState = BaseService.State.Idle
@@ -222,7 +219,15 @@ class RedFragment : Fragment(), ShadowsocksConnection.Callback,
         DataStore.publicStore.registerChangeListener(this)
 
         if (!appSeverLists?.data?.smartList.isNullOrEmpty()) {
-            changeSever(appSeverLists?.data?.smartList?.random())
+            if(currentSelectSever!=null){
+                changeSever(
+                    currentSelectSever, vcurrentSelectSeverIsSmart2222
+                )
+                return
+            }
+            changeSever(
+                appSeverLists?.data?.smartList?.random(), vcurrentSelectSeverIsSmart2222
+            )
         }
     }
 
@@ -256,15 +261,19 @@ class RedFragment : Fragment(), ShadowsocksConnection.Callback,
         globalCanUpdateHomeNative = false
         showHomeAd()
         with(binding) {
-            if (currentSelectSever == null || vcurrentSelectSeverIsSmart) {
+            if (currentSelectSever == null || RedApp.vcurrentSelectSeverIsSmart) {
+                log("Smart-1=${currentSelectSever == null}==${RedApp.vcurrentSelectSeverIsSmart}")
                 textLocation.text = "ServerLocation: Smart"
                 widgetList.severLogo.setImageResource(R.mipmap.smart_sever_logo)
                 widgetList.severTitle.text = "Fastest Server"
+                vcurrentSelectSeverIsSmart2222 = true
             } else {
+                log("Smart-2")
                 textLocation.text = "ServerLocation: ${currentSelectSever!!.countryName}"
                 widgetList.severLogo.setImageResource(getIntFromString(currentSelectSever!!.countryCode))
                 widgetList.severTitle.text =
                     "${currentSelectSever!!.countryName} ${currentSelectSever!!.cityName}"
+                vcurrentSelectSeverIsSmart2222 = false
             }
         }
 
@@ -277,6 +286,7 @@ class RedFragment : Fragment(), ShadowsocksConnection.Callback,
             else -> {}
         }
         resultGlobalAction = ""
+
     }
 
     private var switchStateWithoutRoute = false
@@ -304,10 +314,12 @@ class RedFragment : Fragment(), ShadowsocksConnection.Callback,
             }
             return
         }
-        if (!isNetworkAvailable(requireActivity())) {
-            YellowDialog().show(requireActivity().supportFragmentManager, "YellowDialog")
+        if(isNetworkConnected(requireActivity()){
+                YellowDialog().show(requireActivity().supportFragmentManager, "YellowDialog")
+            }){
             return
-        } else if (addressLimit) {
+        }
+       if (addressLimit) {
             OrangeDialog().show(requireActivity().supportFragmentManager, "OrangeDialog")
             return
         }
@@ -403,12 +415,16 @@ class RedFragment : Fragment(), ShadowsocksConnection.Callback,
             }
         }
     }
+
     private fun resetUiState(connected: Boolean) {
         CoroutineScope(Dispatchers.Main).launch {
             progressAnimation?.cancel()
             goalIsConnect = !connected
             if (isAdded) {
                 if (connected) {
+                    startCount()
+                    binding.textTimer.visibility = View.VISIBLE
+                    binding.widgetSpeed.root.visibility = View.VISIBLE
                     binding.textConnect.text = "Connected"
                     binding.textConnectionState.text = "CONNECTED"
                     binding.progressBar.progress = 100
@@ -419,6 +435,8 @@ class RedFragment : Fragment(), ShadowsocksConnection.Callback,
                         )
                     binding.backgroundImage.setBackgroundResource(R.mipmap.connected_background)
                 } else {
+                    binding.textTimer.visibility = View.INVISIBLE
+                    binding.widgetSpeed.root.visibility = View.INVISIBLE
                     binding.textConnect.text = "Connect"
                     binding.textConnectionState.text = "DISCONNECTED"
                     binding.progressBar.progress = 100
@@ -546,6 +564,7 @@ class RedFragment : Fragment(), ShadowsocksConnection.Callback,
     }
 
     var onceOutGood = false
+
     @Synchronized
     private fun onceOut() {
         if (!isAdded) return
@@ -616,27 +635,27 @@ class RedFragment : Fragment(), ShadowsocksConnection.Callback,
         showHomeJob = null
         showHomeJob = lifecycleScope.launch {
             delay(300)
-        if(lifecycle.currentState.name !=Lifecycle.State.RESUMED.name){
-            return@launch
-        }
-        val baseAd = BaseAd.getHomeInstance()
-        if (AdUtils.blockAdBlacklist()) {
-            binding.adLayout.isVisible = false
-            return@launch
-        }
-        if (!AdUtils.isVPNConnected()) {
-            binding.adLayoutAdmob.isVisible = false
+            if (lifecycle.currentState.name != Lifecycle.State.RESUMED.name) {
+                return@launch
+            }
+            val baseAd = BaseAd.getHomeInstance()
+            if (AdUtils.blockAdBlacklist()) {
+                binding.adLayout.isVisible = false
+                return@launch
+            }
+            if (!AdUtils.isVPNConnected()) {
+                binding.adLayoutAdmob.isVisible = false
+                binding.imgOcAd.isVisible = true
+                return@launch
+            }
+            binding.adLayout.isVisible = true
             binding.imgOcAd.isVisible = true
-            return@launch
-        }
-        binding.adLayout.isVisible = true
-        binding.imgOcAd.isVisible = true
-        baseAd.advertisementLoadingForest(requireActivity())
-        if (baseAd.canShowAd(requireActivity(), baseAd) == 0) {
-            showHomeJob?.cancel()
-            showHomeJob = null
-            return@launch
-        }
+            baseAd.advertisementLoadingForest(requireActivity())
+            if (baseAd.canShowAd(requireActivity(), baseAd) == 0) {
+                showHomeJob?.cancel()
+                showHomeJob = null
+                return@launch
+            }
             while (isActive) {
                 delay(500L)
                 if (baseAd.canShowAd(requireActivity(), baseAd) == 2) {
@@ -691,7 +710,11 @@ class RedFragment : Fragment(), ShadowsocksConnection.Callback,
                                     isConnecting = false
                                     onceInGood = false
                                     showConnectAd(true) {
-                                        onceIn()
+                                        log("showConnectAd=${clondAd}")
+                                        if (!clondAd) {
+                                            onceIn()
+                                            clondAd = false
+                                        }
                                     }
                                 }
                                 goalIsConnect = !goalIsConnect
@@ -710,7 +733,12 @@ class RedFragment : Fragment(), ShadowsocksConnection.Callback,
                         isConnecting = false
                         onceInGood = false
                         showConnectAd(true) {
-                            onceIn()
+                            log("showConnectAd=${clondAd}")
+
+                            if (!clondAd) {
+                                onceIn()
+                                clondAd = false
+                            }
                         }
                     }
                 }
@@ -744,6 +772,7 @@ class RedFragment : Fragment(), ShadowsocksConnection.Callback,
             }
         }
     }
+
     override fun onServiceConnected(service: IShadowsocksService) {
         log("showConnectAd--loading-1--${BaseService.State.values()[service.state].name}")
         changeState(
@@ -755,6 +784,7 @@ class RedFragment : Fragment(), ShadowsocksConnection.Callback,
         )
         resetUiState(AdUtils.isVPNConnected())
     }
+
     override fun onServiceDisconnected() {
         log("showConnectAd--loading-0--")
 
@@ -776,10 +806,12 @@ class RedFragment : Fragment(), ShadowsocksConnection.Callback,
     }
 
     override fun trafficUpdated(profileId: Long, stats: TrafficStats) {
-        binding.widgetSpeed.downloadData.text =
-            String.format("%s", Formatter.formatFileSize(requireActivity(), stats.rxRate))
-        binding.widgetSpeed.uploadData.text =
-            String.format("%s", Formatter.formatFileSize(requireActivity(), stats.txRate))
+        if (isAdded) {
+            binding.widgetSpeed.downloadData.text =
+                String.format("%s", Formatter.formatFileSize(requireActivity(), stats.rxRate))
+            binding.widgetSpeed.uploadData.text =
+                String.format("%s", Formatter.formatFileSize(requireActivity(), stats.txRate))
+        }
     }
 }
 

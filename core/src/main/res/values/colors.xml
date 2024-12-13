@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_launcher_background">#7488A1</color>
+
+    <color name="material_blue_grey_500">#607D8B</color>
+    <color name="material_primary_500">@color/material_blue_grey_500</color>
+    <color name="light_color_primary">@color/material_primary_500</color>
+    <color name="light_color_primary_text">@color/material_primary_500</color>
+
+</resources>

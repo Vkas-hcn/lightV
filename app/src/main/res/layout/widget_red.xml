@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="@drawable/drawable_green"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:paddingHorizontal="6dp"
+    android:paddingVertical="5dp">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/sever_logo"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@mipmap/smart_sever_logo" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/sever_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:text="Fastest Server"
+        android:textColor="#4D3D21"
+        android:textSize="15sp" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="10dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="1dp"
+        android:src="@mipmap/arrow_right_logo"
+        android:tint="#4D3D21" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

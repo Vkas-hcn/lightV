@@ -4,9 +4,11 @@ import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
+import android.util.Log
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.github.shadowsocks.Core
 import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.identifier.AdvertisingIdClient
 import com.google.firebase.FirebaseApp
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.initialize
@@ -17,6 +19,10 @@ import com.light.lightV.indigo.loadAdminType
 import com.light.lightV.red.AppLifeMaster
 import com.light.lightV.red.RedActivity
 import com.tencent.mmkv.MMKV
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.util.UUID
 import kotlin.random.Random
 
 class RedApp : Application() {
@@ -33,10 +39,13 @@ class RedApp : Application() {
             FirebaseApp.initializeApp(this)
             ProcessLifecycleOwner.get().lifecycle.addObserver(AppLifeMaster())
             registerActivityLifecycleCallbacks(AppLifeMaster())
+            setAndroidId()
+            setGid()
             BaseAd.getOpenInstance().isAppOpenSameDayBa()
             getPackages()
             netLimit()
             loadAdminType()
+            AdUtils.haveRefDataChangingBean(this)
         }
     }
 
@@ -77,5 +86,24 @@ class RedApp : Application() {
         lateinit var redApp: Application
         var vcurrentSelectSeverIsSmart = false
         var vcurrentSelectSeverIsSmart2222 = true
+    }
+
+
+    private fun setAndroidId(){
+        val data = AdUtils.andoridIdTba.getKv()
+        if (data.isBlank()) {
+            UUID.randomUUID().toString().putKv(AdUtils.andoridIdTba)
+        }
+    }
+
+    private fun setGid(){
+        CoroutineScope(Dispatchers.IO).launch {
+            val adId = runCatching {
+                AdvertisingIdClient.getAdvertisingIdInfo(redApp).id
+            }.getOrNull() ?: ""
+            Log.d("AdId", "Google Advertising ID: $adId")
+            adId.putKv(AdUtils.gIdTba)
+
+        }
     }
 }

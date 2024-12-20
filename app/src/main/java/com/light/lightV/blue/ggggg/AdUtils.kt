@@ -3,6 +3,9 @@ package com.light.lightV.blue.ggggg
 import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
+import androidx.lifecycle.lifecycleScope
+import com.android.installreferrer.api.InstallReferrerClient
+import com.android.installreferrer.api.InstallReferrerStateListener
 import com.github.shadowsocks.bg.BaseService
 import com.google.gson.Gson
 import com.light.lightV.BuildConfig
@@ -27,6 +30,7 @@ import org.json.JSONObject
 import java.io.IOException
 
 object AdUtils {
+    val tbaUrl = if(BuildConfig.DEBUG){"https://test-cache.sunrisefast.com/coventry/haines"}else{"https://cache.sunrisefast.com/suffice/boletus"}
     var connectIp = ""
     var connectCity = ""
     var openTypeIp = ""
@@ -41,6 +45,12 @@ object AdUtils {
     const val local_c_n = "local_c_n"
     const val ad_load_date = "ad_load_date"
     const val cmpState = "cmpState"
+
+    const val andoridIdTba = "andoridIdTba"
+    const val gIdTba = "gIdTba"
+    const val installTbaState = "installTbaState"
+    const val refTba = "refTba"
+
     fun log(msg: String) {
         if (BuildConfig.DEBUG) {
             Log.e("TAG", msg)
@@ -230,6 +240,74 @@ object AdUtils {
                 }
             }
         })
+    }
+
+
+    fun postPutData(body: Any, callback: CallbackPost) {
+        val client = OkHttpClient()
+
+        val requestBody = RequestBody.create("application/json; charset=utf-8".toMediaTypeOrNull(), body.toString())
+
+        val request = Request.Builder()
+            .url(tbaUrl)
+            .post(requestBody)
+            .addHeader("Content-Type", "application/json; charset=UTF-8")
+            .addHeader("Accept", "application/json")
+            .build()
+
+        client.newCall(request).enqueue(object : okhttp3.Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                callback.onFailure("Network error: ${e.message}")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (!response.isSuccessful) {
+                    callback.onFailure("Unexpected code $response")
+                    return
+                }
+
+                val responseBody = response.body?.string()
+                if (response.isSuccessful && responseBody != null) {
+                    callback.onSuccess(responseBody)
+                } else {
+                    callback.onFailure("Response body is null or unsuccessful")
+                }
+            }
+        })
+    }
+    interface CallbackPost {
+        fun onSuccess(responseBody: String)
+        fun onFailure(errorMessage: String)
+    }
+
+     fun haveRefDataChangingBean(context: Context) {
+        runCatching {
+            val referrerClient = InstallReferrerClient.newBuilder(context).build()
+            referrerClient.startConnection(object : InstallReferrerStateListener {
+                override fun onInstallReferrerSetupFinished(p0: Int) {
+                    when (p0) {
+                        InstallReferrerClient.InstallReferrerResponse.OK -> {
+                                (referrerClient.installReferrer.installReferrer ?: "").putKv(refTba)
+//                            val timeElapsed =
+//                                ((System.currentTimeMillis() - App.appTimeStart) / 1000).toInt()
+//                            lifecycleScope.launch(Dispatchers.IO) {
+//                                Postadmin().getAdminData(this@StartActivity)
+//                                PutDataUtils.postPointData("u_rf", "time", timeElapsed)
+//                            }
+                            TTUtils.emitInstallData(
+                                context,
+                                referrerClient.installReferrer
+                            )
+                        }
+                    }
+                    referrerClient.endConnection()
+                }
+
+                override fun onInstallReferrerServiceDisconnected() {
+                }
+            })
+        }.onFailure { e ->
+        }
     }
 
 }

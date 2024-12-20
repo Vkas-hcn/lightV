@@ -26,6 +26,7 @@ import com.light.lightV.blue.MobState
 import com.light.lightV.blue.RedMob
 import com.light.lightV.blue.ggggg.AdUtils
 import com.light.lightV.blue.ggggg.BaseAd
+import com.light.lightV.blue.ggggg.TTUtils
 import com.light.lightV.databinding.ActivityRedBinding
 import com.light.lightV.green.RedApp
 import com.light.lightV.green.RedApp.Companion.redApp
@@ -75,6 +76,7 @@ class RedActivity : AppCompatActivity() {
         initTime()
         sendPoint("open_sun", "userCode".getKv())
         AdUtils.getBlackList(this)
+        seeTba()
         globalCanUpdateHomeNative = true
         globalCanUpdateResultNative = true
         loadSevers()
@@ -95,7 +97,10 @@ class RedActivity : AppCompatActivity() {
         getFileBaseData()
         startCountdown()
         RedApp().getUserDId()
+    }
 
+    fun seeTba(){
+        TTUtils.emitSessionData()
     }
 
     private fun startCountdown() {
